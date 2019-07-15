@@ -30,6 +30,7 @@
 
 <script>
     import MyEditor from '../components/editor'
+    import axios from 'axios'
     export default {
         components:{
             MyEditor
@@ -45,10 +46,28 @@
                 cssEditor:null,
             }
         },
+        created() {
+            if (this.$route.query.i) {
+                this.initCode(this.$route.query.i)
+            }
+        },
         mounted() {
+
             this.runCode()
+
         },
         methods:{
+            initCode(id) {
+                axios.get('http://localhost:3000/api/code/' + id)
+                    .then((res) => {
+                      if (res.data.error === 0) {
+                          this.htmlCodes = res.data.code.html
+                          this.javascriptCodes = res.data.code.js
+                          this.cssCodes = res.data.code.css
+                          this.$forceUpdate()
+                      }
+                    })
+            },
             runCode() {
                 let t = "<html><head><style type='text/css'>" + this.cssCodes + "</style></head><body>" + this.htmlCodes + "</body><script type='text/javascript'>"+ this.javascriptCodes+ '<\/script></html>'
                 let result = document.getElementById('result')
